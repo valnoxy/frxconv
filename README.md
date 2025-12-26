@@ -4,7 +4,7 @@ Convert Roaming Profile to FSLogix User Disk.
 
 ## 🔧 Usage
 
-´´´
+```
 Syntax:
   frxconv.exe [Domain\Username] [Path\To\Store] [Disk Size in MB] (-dynamic)
 
@@ -19,7 +19,7 @@ Options:
 
 Example:
   frxconv.exe Contoso\John.Doe D:\FSLogixStore 30720 -dynamic
-´´´
+```
 
 ## 🧾 License
 Frxconv is licensed under [MIT](https://github.com/valnoxy/frxconv/blob/main/LICENSE). So you are allowed to use freely and modify the application. I will not be responsible for any outcome. Proceed with any action at your own risk.
