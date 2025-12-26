@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PublishAot>true</PublishAot>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<AssemblyName>FrxConv</AssemblyName>
+		<Description>FSLogix Profile Migration Tool</Description>
+		<Company>Exploitox</Company>
+		<Authors>valnoxy</Authors>
+		<Version>2.0.0.0</Version>
+		<Copyright>Copyright © 2018 - 2025 Exploitox. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/FrxConv</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/valnoxy/FrxConv</RepositoryUrl>
+		<ApplicationIcon>bucker.ico</ApplicationIcon>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<FileVersion>$(Version)</FileVersion>
+		<AssemblyInformationalVersion>$(Version)</AssemblyInformationalVersion>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Spectre.Console" Version="0.49.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="bucker.ico" />
+	</ItemGroup>
+
+</Project>

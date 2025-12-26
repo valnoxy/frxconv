@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "frxconv": {
+      "commandName": "Project",
+      "commandLineArgs": "VNXY\\m.muster Z:\\ 4086 -dynamic",
+      "remoteDebugEnabled": false,
+      "remoteDebugMachine": "10.0.0.81:4026"
+    }
+  }
+}
