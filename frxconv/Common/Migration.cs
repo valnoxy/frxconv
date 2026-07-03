@@ -9,9 +9,10 @@ namespace frxconv.Common
             "AppData\\Local\\Temp",
             "AppData\\Local\\Microsoft\\Windows\\Explorer",
             "AppData\\Local\\Microsoft\\Windows\\INetCache",
+            "AppData\\Local\\Microsoft\\Windows\\WER",
+            "AppData\\Local\\Microsoft\\WindowsApps",
             "AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cache",
             "AppData\\Local\\CrashDumps",
-            "AppData\\Local\\Microsoft\\Windows\\WER",
             "AppData\\Local\\NVIDIA\\DXCache",
             "AppData\\Roaming\\Microsoft\\Windows\\Recent",
             ".vscode\\extensions",
@@ -27,25 +28,43 @@ namespace frxconv.Common
                 AnsiConsole.MarkupLine("[red bold]ERROR[/]: Source directory does not exist!");
                 return false;
             }
-            CopyDirectory(source, destination, ExcludedPaths, task, ctx);
+
+            task.IsIndeterminate = false;
+            task.MaxValue = 100;
+            task.Value = 0;
+            
+            CopyDirectory(source, source, destination, ExcludedPaths, task, ctx);
+
+            task.Value = 100;
             return true;
         }
 
-        private static void CopyDirectory(string sourceDir, string destDir, string[]? excludePaths, ProgressTask task, ProgressContext ctx)
+        private static void CopyDirectory(string rootSourceDir, string currentSourceDir, string destDir, string[]? excludePaths, ProgressTask task, ProgressContext ctx)
         {
-            if (!Directory.Exists(sourceDir)) return;
+            if (!Directory.Exists(currentSourceDir)) return;
 
             Directory.CreateDirectory(destDir);
 
-            var files = Directory.GetFiles(sourceDir);
-            task.MaxValue = files.Length + Directory.GetDirectories(sourceDir).Length;
+            // Find files in the current directory and copy them to the destination
+            string[] files;
+            try
+            {
+                files = Directory.GetFiles(currentSourceDir);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[yellow bold]WARN[/]: Cannot read files from [blue]{currentSourceDir}[/]: {ex.Message}");
+                return;
+            }
+
             foreach (var file in files)
             {
                 try
                 {
                     var destFile = Path.Combine(destDir, Path.GetFileName(file));
                     File.Copy(file, destFile, true);
-                    task.Increment(1);
+
+                    if (task.Value < 99) task.Increment(0.05);
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -54,15 +73,29 @@ namespace frxconv.Common
                 catch (Exception ex)
                 {
                     AnsiConsole.MarkupLine($"[red bold]ERROR[/]: Failed to copy file [blue]{file}[/]!");
+                    AnsiConsole.MarkupLine($"[red bold]ERROR[/]: {ex.Message}");
                 }
             }
 
-            var directories = Directory.GetDirectories(sourceDir);
+            // Get directories and recursively copy them
+            string[] directories;
+            try
+            {
+                directories = Directory.GetDirectories(currentSourceDir);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
             foreach (var dir in directories)
             {
-                var relativePath = dir[(sourceDir.Length + 1)..];
+                var relativePath = Path.GetRelativePath(rootSourceDir, dir);
                 if (excludePaths != null && Array.Exists(excludePaths, p => relativePath.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
+                {
                     continue;
+                }
+
                 try
                 {
                     if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
@@ -75,8 +108,8 @@ namespace frxconv.Common
                     AnsiConsole.MarkupLine($"[red bold]WARN[/]: Failed to check object [blue]{dir}[/]: {ex.Message}");
                     continue;
                 }
-                CopyDirectory(dir, Path.Combine(destDir, Path.GetFileName(dir)), excludePaths, task, ctx);
-                task.Increment(1);
+
+                CopyDirectory(rootSourceDir, dir, Path.Combine(destDir, Path.GetFileName(dir)), excludePaths, task, ctx);
             }
         }
     }
